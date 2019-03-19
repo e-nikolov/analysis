@@ -997,17 +997,21 @@ func updateRef(spec *swspec.Swagger, key string, ref swspec.Ref) error {
 		}
 		switch container := pvalue.(type) {
 		case swspec.Definitions:
-			container[entry] = swspec.Schema{SchemaProps: swspec.SchemaProps{Ref: ref}}
+			schema := container[entry]
+			schema.Ref = ref
+			container[entry] = schema
 
 		case map[string]swspec.Schema:
-			container[entry] = swspec.Schema{SchemaProps: swspec.SchemaProps{Ref: ref}}
+			schema := container[entry]
+			schema.Ref = ref
+			container[entry] = schema
 
 		case []swspec.Schema:
 			idx, err := strconv.Atoi(entry)
 			if err != nil {
 				return fmt.Errorf("%s not a number: %v", pth, err)
 			}
-			container[idx] = swspec.Schema{SchemaProps: swspec.SchemaProps{Ref: ref}}
+			container[idx].Ref = ref
 
 		case *swspec.SchemaOrArray:
 			// NOTE: this is necessarily an array - otherwise, the parent would be *Schema
@@ -1015,7 +1019,7 @@ func updateRef(spec *swspec.Swagger, key string, ref swspec.Ref) error {
 			if err != nil {
 				return fmt.Errorf("%s not a number: %v", pth, err)
 			}
-			container.Schemas[idx] = swspec.Schema{SchemaProps: swspec.SchemaProps{Ref: ref}}
+			container.Schemas[idx].Ref = ref
 
 		// NOTE: can't have case *swspec.SchemaOrBool = parent in this case is *Schema
 
